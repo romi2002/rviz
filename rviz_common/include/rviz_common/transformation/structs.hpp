@@ -43,6 +43,7 @@ struct RVIZ_COMMON_PUBLIC Time
 {
   Time();
   Time(int32_t sec, uint32_t nanosec);
+  Time(int64_t nanosec);
 
   int32_t seconds;
   uint32_t nanoseconds;

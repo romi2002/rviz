@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Bosch Software Innovations GmbH.
+ * Copyright (c) 2019, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,67 +27,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "rviz_common/transformation/structs.hpp"
+#ifndef RVIZ_COMMON__TRANSFORMATION__TF2_HELPERS__TF2_CONVERSION_HELPERS_HPP_
+#define RVIZ_COMMON__TRANSFORMATION__TF2_HELPERS__TF2_CONVERSION_HELPERS_HPP_
 
-#include <string>
+#include <rclcpp/rclcpp.hpp>
+
+#include "rviz_common/visibility_control.hpp"
 
 namespace rviz_common
 {
 namespace transformation
 {
-
-Time::Time()
-: seconds(0), nanoseconds(0) {}
-
-Time::Time(int32_t sec, uint32_t nanosec)
-: seconds(sec), nanoseconds(nanosec)
-{}
-
-Time::Time(int64_t nanosec)
+namespace tf2_helpers
 {
-  seconds = static_cast<int32_t>(nanosec / (1000LL * 1000LL * 1000LL));
-  nanoseconds =
-    static_cast<uint32_t>(nanosec - (static_cast<int64_t>(seconds) * (1000LL * 1000LL * 1000LL)));
+
+rclcpp::Time
+fromTf2TimePoint(const tf2::TimePoint & tf2_time)
+{
+  const auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(tf2_time);
+  const auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(tf2_time) -
+                           std::chrono::time_point_cast<std::chrono::nanoseconds>(seconds);
+  return rclcpp::Time(seconds.time_since_epoch().count(), nanoseconds.count());
 }
 
-Point::Point()
-: x(0), y(0), z(0) {}
+RVIZ_COMMON_PUBLIC
+tf2::TimePoint
+toTf2TimePoint(const rclcpp::Time & time)
+{
+  return std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>(
+      std::chrono::nanoseconds{time.nanoseconds()});
+}
 
-Point::Point(double x, double y, double z)
-: x(x), y(y), z(z)
-{}
-
-Quaternion::Quaternion()
-: w(1), x(0), y(0), z(0) {}
-
-Quaternion::Quaternion(double w, double x, double y, double z)
-: w(w), x(x), y(y), z(z)
-{}
-
-PoseStamped::PoseStamped()
-: time_stamp(), frame_id(""), position(), orientation() {}
-
-PoseStamped::PoseStamped(
-  Time time, std::string frame, Point position_vector, Quaternion orientation_quat)
-: time_stamp(time), frame_id(frame), position(position_vector), orientation(orientation_quat)
-{}
-
-TransformStamped::TransformStamped()
-: time_stamp(), parent_frame_id(""), child_frame_id(""), translation(), rotation()
-{}
-
-TransformStamped::TransformStamped(
-  Time time,
-  std::string parent_frame,
-  std::string child_frame,
-  Point translation_vector,
-  Quaternion rotation_quat)
-: time_stamp(time),
-  parent_frame_id(parent_frame),
-  child_frame_id(child_frame),
-  translation(translation_vector),
-  rotation(rotation_quat)
-{}
-
+}  // namespace tf2_helpers
 }  // namespace transformation
 }  // namespace rviz_common
+
+#endif  // RVIZ_COMMON__TRANSFORMATION__TF2_HELPERS__TF2_CONVERSION_HELPERS_HPP_

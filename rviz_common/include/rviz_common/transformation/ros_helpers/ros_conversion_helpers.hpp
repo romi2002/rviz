@@ -98,6 +98,10 @@ RVIZ_COMMON_PUBLIC
 geometry_msgs::msg::PoseStamped
 toRosPoseStamped(rviz_common::transformation::PoseStamped pose_stamped);
 
+RVIZ_COMMON_PUBLIC
+geometry_msgs::msg::TransformStamped
+toRosTransformStamped(rviz_common::transformation::TransformStamped transform_stamped);
+
 }  // namespace ros_helpers
 }  // namespace transformation
 }  // namespace rviz_common

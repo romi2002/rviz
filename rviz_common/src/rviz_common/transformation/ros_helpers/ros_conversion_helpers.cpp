@@ -153,6 +153,19 @@ geometry_msgs::msg::PoseStamped toRosPoseStamped(
   return ros_pose;
 }
 
+geometry_msgs::msg::TransformStamped toRosTransformStamped(
+  rviz_common::transformation::TransformStamped transform_stamped)
+{
+  geometry_msgs::msg::TransformStamped ros_transform_stamped;
+  ros_transform_stamped.header = toRosHeader(
+    transform_stamped.time_stamp, transform_stamped.parent_frame_id);
+  ros_transform_stamped.child_frame_id = transform_stamped.child_frame_id;
+  ros_transform_stamped.transform.translation = toRosVector3(transform_stamped.translation);
+  ros_transform_stamped.transform.rotation = toRosQuaternion(transform_stamped.rotation);
+
+  return ros_transform_stamped;
+}
+
 }  // namespace ros_helpers
 }  // namespace transformation
 }  // namespace rviz_common
